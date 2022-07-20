@@ -1,0 +1,912 @@
+openapi: 3.0.3
+info:
+  description: The DHOS Telemetry API is responsible for storing and retrieving information
+    about user installations.
+  title: DHOS Telemetry API
+  version: 1.0.0
+paths:
+  /running:
+    get:
+      summary: Verify service is running
+      description: Verifies that the service is running. Used for monitoring in kubernetes.
+      tags:
+      - monitoring
+      responses:
+        '200':
+          description: If we respond, we are running
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  running:
+                    type: boolean
+                    example: true
+      operationId: flask_batteries_included.blueprint_monitoring.app_running
+  /version:
+    get:
+      summary: Get version information
+      description: Get the version number, circleci build number, and git hash.
+      tags:
+      - monitoring
+      responses:
+        '200':
+          description: Version numbers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  circle:
+                    type: string
+                    example: '1234'
+                  hash:
+                    type: string
+                    example: 366c204
+      operationId: flask_batteries_included.blueprint_monitoring.app_version
+  /dhos/v1/patient/{patient_id}/installation:
+    post:
+      summary: Create patient installation
+      description: Create a new patient installation using the details in the request
+        body
+      tags:
+      - patient
+      parameters:
+      - in: path
+        name: patient_id
+        required: true
+        schema:
+          type: string
+          example: 5579f479-c28d-4657-b9e1-cdd36ca8ecad
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientInstallationRequest'
+      responses:
+        '200':
+          description: New patient installation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientInstallationResponse'
+        default:
+          description: Error, e.g. 400 Bad Request, 503 Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      operationId: dhos_telemetry_api.blueprint_api.create_patient_installation
+      security:
+      - bearerAuth: []
+  /dhos/v1/patient/{patient_id}/installation/{installation_id}:
+    patch:
+      summary: Update patient installation
+      description: Update the patient installation with the provided UUID using the
+        details provided in the request body
+      tags:
+      - patient
+      parameters:
+      - in: path
+        name: patient_id
+        required: true
+        schema:
+          type: string
+          example: 7b958ac5-0b8c-4c4e-b992-a87940b4439a
+      - in: path
+        name: installation_id
+        required: true
+        schema:
+          type: string
+          example: a25497b1-c9aa-42bd-bdda-896821073506
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientInstallationUpdateRequest'
+      responses:
+        '200':
+          description: Updated patient installation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientInstallationResponse'
+        default:
+          description: Error, e.g. 400 Bad Request, 503 Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      operationId: dhos_telemetry_api.blueprint_api.update_patient_installation
+      security:
+      - bearerAuth: []
+    get:
+      summary: Get patient installation by UUID
+      description: Get the patient installation with the provided UUID
+      tags:
+      - patient
+      parameters:
+      - in: path
+        name: patient_id
+        required: true
+        schema:
+          type: string
+          example: 7b958ac5-0b8c-4c4e-b992-a87940b4439a
+      - in: path
+        name: installation_id
+        required: true
+        schema:
+          type: string
+          example: a25497b1-c9aa-42bd-bdda-896821073506
+      responses:
+        '200':
+          description: The patient installation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientInstallationResponse'
+        default:
+          description: Error, e.g. 400 Bad Request, 503 Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      operationId: dhos_telemetry_api.blueprint_api.get_patient_installation
+      security:
+      - bearerAuth: []
+  /dhos/v1/patient/{patient_id}/latest_installation:
+    get:
+      summary: Get latest patient installation
+      description: Get the latest installation for the patient with the provided UUID
+      tags:
+      - patient
+      parameters:
+      - in: path
+        name: patient_id
+        required: true
+        schema:
+          type: string
+          example: 7b958ac5-0b8c-4c4e-b992-a87940b4439a
+      responses:
+        '200':
+          description: Latest patient installation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientInstallationResponse'
+        default:
+          description: Error, e.g. 400 Bad Request, 503 Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      operationId: dhos_telemetry_api.blueprint_api.get_latest_patient_installation
+      security:
+      - bearerAuth: []
+  /dhos/v1/clinician/{clinician_id}/installation:
+    post:
+      summary: Create clinician installation
+      description: Create a new clinician installation using the details in the request
+        body
+      tags:
+      - clinician
+      parameters:
+      - in: path
+        name: clinician_id
+        required: true
+        schema:
+          type: string
+          example: 6ed98323-9302-4ad3-8c51-2e1ca938513e
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClinicianInstallationRequest'
+      responses:
+        '200':
+          description: New clinician installation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClinicianInstallationResponse'
+        default:
+          description: Error, e.g. 400 Bad Request, 503 Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      operationId: dhos_telemetry_api.blueprint_api.create_clinician_installation
+      security:
+      - bearerAuth: []
+  /dhos/v1/clinician/{clinician_id}/installation/{installation_id}:
+    get:
+      summary: Get clinician installation by UUID
+      description: Get the clinician installation with the provided UUID
+      tags:
+      - clinician
+      parameters:
+      - in: path
+        name: clinician_id
+        required: true
+        schema:
+          type: string
+          example: 7b958ac5-0b8c-4c4e-b992-a87940b4439a
+      - in: path
+        name: installation_id
+        required: true
+        schema:
+          type: string
+          example: a25497b1-c9aa-42bd-bdda-896821073506
+      responses:
+        '200':
+          description: The clinician installation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClinicianInstallationResponse'
+        default:
+          description: Error, e.g. 400 Bad Request, 503 Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      operationId: dhos_telemetry_api.blueprint_api.get_clinician_installation
+      security:
+      - bearerAuth: []
+    patch:
+      summary: Update clinician installation
+      description: Update the clinician installation with the provided UUID using
+        the details provided in the request body
+      tags:
+      - clinician
+      parameters:
+      - in: path
+        name: clinician_id
+        required: true
+        schema:
+          type: string
+          example: 7b958ac5-0b8c-4c4e-b992-a87940b4439a
+      - in: path
+        name: installation_id
+        required: true
+        schema:
+          type: string
+          example: a25497b1-c9aa-42bd-bdda-896821073506
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClinicianInstallationUpdateRequest'
+      responses:
+        '200':
+          description: Updated clinician installation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClinicianInstallationResponse'
+        default:
+          description: Error, e.g. 400 Bad Request, 503 Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      operationId: dhos_telemetry_api.blueprint_api.update_clinician_installation
+      security:
+      - bearerAuth: []
+  /dhos/v1/clinician/{clinician_id}/latest_installation:
+    get:
+      summary: Get latest clinician installation
+      description: Get the latest installation for the clincian with the provided
+        UUID
+      tags:
+      - clinician
+      parameters:
+      - in: path
+        name: clinician_id
+        required: true
+        schema:
+          type: string
+          example: 7b958ac5-0b8c-4c4e-b992-a87940b4439a
+      responses:
+        '200':
+          description: Latest clinician installation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClinicianInstallationResponse'
+        default:
+          description: Error, e.g. 400 Bad Request, 503 Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      operationId: dhos_telemetry_api.blueprint_api.get_latest_clinician_installation
+      security:
+      - bearerAuth: []
+  /dhos/v1/patient/{patient_id}/blood_glucose_meter:
+    post:
+      summary: Create patient blood glucose meter
+      description: Create a patient blood glucose meter using the details in the request
+        body
+      tags:
+      - blood-glucose-meter
+      parameters:
+      - in: path
+        name: patient_id
+        required: true
+        schema:
+          type: string
+          example: 5579f479-c28d-4657-b9e1-cdd36ca8ecad
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              x-body-name: meter_data
+              $ref: '#/components/schemas/BloodGlucoseMeterRequest'
+      responses:
+        '201':
+          description: New blood glucose meter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BloodGlucoseMeterResponse'
+        default:
+          description: Error, e.g. 400 Bad Request, 503 Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      operationId: dhos_telemetry_api.blueprint_api.create_blood_glucose_meter
+      security:
+      - bearerAuth: []
+  /dhos/v1/patient/{patient_id}/blood_glucose_meter/{meter_id}:
+    patch:
+      summary: Update patient blood glucose meter
+      description: Update a patient blood glucose meter using the details in the request
+        body
+      tags:
+      - blood-glucose-meter
+      parameters:
+      - in: path
+        name: patient_id
+        required: true
+        schema:
+          type: string
+          example: 5579f479-c28d-4657-b9e1-cdd36ca8ecad
+      - in: path
+        name: meter_id
+        required: true
+        schema:
+          type: string
+          example: 85:65:78:65:78
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              x-body-name: meter_data
+              $ref: '#/components/schemas/BloodGlucoseMeterUpdate'
+      responses:
+        '200':
+          description: New blood glucose meter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BloodGlucoseMeterUpdate'
+        default:
+          description: Error, e.g. 400 Bad Request, 503 Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      operationId: dhos_telemetry_api.blueprint_api.update_blood_glucose_meter
+      security:
+      - bearerAuth: []
+    get:
+      summary: Get patient blood glucose meter
+      description: Get a patient blood glucose meter by UUID
+      tags:
+      - blood-glucose-meter
+      parameters:
+      - in: path
+        name: meter_id
+        required: true
+        schema:
+          type: string
+          example: 85:65:78:65:78
+      - in: path
+        name: patient_id
+        required: true
+        schema:
+          type: string
+          example: 5579f479-c28d-4657-b9e1-cdd36ca8ecad
+      responses:
+        '200':
+          description: Blood glucose meter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BloodGlucoseMeterResponse'
+        default:
+          description: Error, e.g. 400 Bad Request, 503 Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      operationId: dhos_telemetry_api.blueprint_api.get_blood_glucose_meter
+      security:
+      - bearerAuth: []
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: HTTP response code
+          example: 404
+        message:
+          type: string
+          description: Message attached to response
+          example: Not Found
+      required:
+      - code
+      description: An error response in json format
+    PatientInstallationRequest:
+      type: object
+      properties:
+        app_product:
+          type: string
+          description: Product name for the installation
+          example: GDM
+        app_version:
+          type: string
+          description: Version string of app
+          example: v19.1.31
+        date_first_launched:
+          type: string
+          description: ISO8601 datetime of first app launch
+          example: '2020-01-01T00:00:00.000Z'
+        phone_os:
+          type: string
+          description: Phone operating system
+          example: iOS
+        phone_os_version:
+          type: string
+          description: Phone operating system version
+          example: '11.0'
+        manufacturer:
+          type: string
+          description: Phone manufacturer
+          example: Apple, Inc.
+        model:
+          type: string
+          description: Phone model
+          example: '6'
+        display_name:
+          type: string
+          description: Phone display name
+          example: Apple iPhone 6S
+        unique_device_code:
+          type: string
+          description: A unique code to identify the device
+          example: '12345'
+      required:
+      - app_product
+      - app_version
+      - date_first_launched
+      - display_name
+      - manufacturer
+      - model
+      - phone_os
+      - phone_os_version
+      - unique_device_code
+      title: Patient Installation Request
+    PatientInstallationResponse:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Universally unique identifier for object
+          example: 2c4f1d24-2952-4d4e-b1d1-3637e33cc161
+        created:
+          type: string
+          description: When the object was created
+          example: '2017-09-23T08:29:19.123+00:00'
+        created_by:
+          type: string
+          description: UUID of the user that created the object
+          example: d26570d8-a2c9-4906-9c6a-ea1a98b8b80f
+        modified:
+          type: string
+          description: When the object was modified
+          example: '2017-09-23T08:29:19.123+00:00'
+        modified_by:
+          type: string
+          description: UUID of the user that modified the object
+          example: 2a0e26e5-21b6-463a-92e8-06d7290067d0
+        app_product:
+          type: string
+          description: Product name for the installation
+          example: GDM
+        app_version:
+          type: string
+          description: Version string of app
+          example: v19.1.31
+        date_first_launched:
+          type: string
+          description: ISO8601 datetime of first app launch
+          example: '2020-01-01T00:00:00.000Z'
+        phone_os:
+          type: string
+          description: Phone operating system
+          example: iOS
+        phone_os_version:
+          type: string
+          description: Phone operating system version
+          example: '11.0'
+        manufacturer:
+          type: string
+          description: Phone manufacturer
+          example: Apple, Inc.
+        model:
+          type: string
+          description: Phone model
+          example: '6'
+        display_name:
+          type: string
+          description: Phone display name
+          example: Apple iPhone 6S
+        unique_device_code:
+          type: string
+          description: A unique code to identify the device
+          example: '12345'
+      required:
+      - app_product
+      - app_version
+      - date_first_launched
+      - display_name
+      - manufacturer
+      - model
+      - phone_os
+      - phone_os_version
+      - unique_device_code
+      - uuid
+      title: Patient Installation Response
+    PatientInstallationUpdateRequest:
+      type: object
+      properties:
+        app_product:
+          type: string
+          description: Product name for the installation
+          example: GDM
+        app_version:
+          type: string
+          description: Version string of app
+          example: v19.1.31
+        date_first_launched:
+          type: string
+          description: ISO8601 datetime of first app launch
+          example: '2020-01-01T00:00:00.000Z'
+        phone_os:
+          type: string
+          description: Phone operating system
+          example: iOS
+        phone_os_version:
+          type: string
+          description: Phone operating system version
+          example: '11.0'
+        manufacturer:
+          type: string
+          description: Phone manufacturer
+          example: Apple, Inc.
+        model:
+          type: string
+          description: Phone model
+          example: '6'
+        display_name:
+          type: string
+          description: Phone display name
+          example: Apple iPhone 6S
+      title: Patient Installation Update Request
+    ClinicianInstallationRequest:
+      type: object
+      properties:
+        app_product:
+          type: string
+          description: Product name for the installation
+          example: GDM
+        app_version:
+          type: string
+          description: Version string of app
+          example: v19.1.31
+        date_first_used:
+          type: string
+          description: ISO8601 datetime of first desktop use
+          example: '2019-08-11T11:59:50.123+01:00'
+        desktop_os:
+          type: string
+          description: Desktop operating system
+          example: Windows
+        desktop_os_version:
+          type: string
+          description: Desktop operating system version
+          example: '10'
+        ip_address:
+          type: string
+          description: IP Address of client
+          example: 1.2.3.4
+        unique_device_code:
+          type: string
+          description: A unique code to identify the device
+          example: '12345'
+      required:
+      - app_product
+      - app_version
+      - date_first_used
+      - desktop_os
+      - desktop_os_version
+      - ip_address
+      - unique_device_code
+      title: Clinician Installation Request
+    ClinicianInstallationResponse:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Universally unique identifier for object
+          example: 2c4f1d24-2952-4d4e-b1d1-3637e33cc161
+        created:
+          type: string
+          description: When the object was created
+          example: '2017-09-23T08:29:19.123+00:00'
+        created_by:
+          type: string
+          description: UUID of the user that created the object
+          example: d26570d8-a2c9-4906-9c6a-ea1a98b8b80f
+        modified:
+          type: string
+          description: When the object was modified
+          example: '2017-09-23T08:29:19.123+00:00'
+        modified_by:
+          type: string
+          description: UUID of the user that modified the object
+          example: 2a0e26e5-21b6-463a-92e8-06d7290067d0
+        app_product:
+          type: string
+          description: Product name for the installation
+          example: GDM
+        app_version:
+          type: string
+          description: Version string of app
+          example: v19.1.31
+        date_first_used:
+          type: string
+          description: ISO8601 datetime of first desktop use
+          example: '2019-08-11T11:59:50.123+01:00'
+        desktop_os:
+          type: string
+          description: Desktop operating system
+          example: Windows
+        desktop_os_version:
+          type: string
+          description: Desktop operating system version
+          example: '10'
+        ip_address:
+          type: string
+          description: IP Address of client
+          example: 1.2.3.4
+        unique_device_code:
+          type: string
+          description: A unique code to identify the device
+          example: '12345'
+      required:
+      - app_product
+      - app_version
+      - date_first_used
+      - desktop_os
+      - desktop_os_version
+      - ip_address
+      - unique_device_code
+      - uuid
+      title: Clinician Installation Response
+    ClinicianInstallationUpdateRequest:
+      type: object
+      properties:
+        app_product:
+          type: string
+          description: Product name for the installation
+          example: GDM
+        app_version:
+          type: string
+          description: Version string of app
+          example: v19.1.31
+        date_first_used:
+          type: string
+          description: ISO8601 datetime of first desktop use
+          example: '2019-08-11T11:59:50.123+01:00'
+        desktop_os:
+          type: string
+          description: Desktop operating system
+          example: Windows
+        desktop_os_version:
+          type: string
+          description: Desktop operating system version
+          example: '10'
+        ip_address:
+          type: string
+          description: IP Address of client
+          example: 1.2.3.4
+      title: Clinician Installation Update Request
+    BloodGlucoseMeterRequest:
+      type: object
+      properties:
+        app_version:
+          type: string
+          description: Application version number
+          example: 19.1.54
+        app_product:
+          type: string
+          description: Application product
+          example: GDM
+        date_verified:
+          type: string
+          format: date-time
+          description: ISO8601 datetime when verification of blood glucose reading
+            was performed
+          example: '2021-10-27T11:59:50.123+01:00'
+        mobile_id:
+          type: string
+          description: Mobile device UUID
+          example: c28eb1cb-ca58-41b8-8acb-15721553f4f2
+        serial_number:
+          type: string
+          description: Bluetooth device serial number
+          example: SN987654321
+        is_bg_value_correct:
+          type: boolean
+          description: Was the blood glucose reading correct
+          example: true
+        blood_glucose_value:
+          type: number
+          description: Blood glucose value
+          example: '5.5'
+      required:
+      - mobile_id
+      - serial_number
+      title: Bluetooth meter request
+    BloodGlucoseMeterResponse:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Universally unique identifier for object
+          example: 2c4f1d24-2952-4d4e-b1d1-3637e33cc161
+        created:
+          type: string
+          description: When the object was created
+          example: '2017-09-23T08:29:19.123+00:00'
+        created_by:
+          type: string
+          description: UUID of the user that created the object
+          example: d26570d8-a2c9-4906-9c6a-ea1a98b8b80f
+        modified:
+          type: string
+          description: When the object was modified
+          example: '2017-09-23T08:29:19.123+00:00'
+        modified_by:
+          type: string
+          description: UUID of the user that modified the object
+          example: 2a0e26e5-21b6-463a-92e8-06d7290067d0
+        app_version:
+          type: string
+          description: Application version number
+          example: 19.1.54
+        app_product:
+          type: string
+          description: Application product
+          example: GDM
+        date_verified:
+          type: string
+          format: date-time
+          description: ISO8601 datetime when verification of blood glucose reading
+            was performed
+          example: '2021-10-27T11:59:50.123+01:00'
+        mobile_id:
+          type: string
+          description: Mobile device UUID
+          example: c28eb1cb-ca58-41b8-8acb-15721553f4f2
+        serial_number:
+          type: string
+          description: Bluetooth device serial number
+          example: SN987654321
+        is_bg_value_correct:
+          type: boolean
+          description: Was the blood glucose reading correct
+          example: true
+        blood_glucose_value:
+          type: number
+          description: Blood glucose value
+          example: '5.5'
+        patient_id:
+          type: string
+          description: Associated patient's UUID
+          example: c28eb1cb-ca58-41b8-8acb-15721553f4f2
+      required:
+      - mobile_id
+      - patient_id
+      - serial_number
+      - uuid
+      title: Bluetooth meter response
+    BloodGlucoseMeterUpdate:
+      type: object
+      properties:
+        patient_id:
+          type: string
+          description: Associated patient's UUID
+          example: c28eb1cb-ca58-41b8-8acb-15721553f4f2
+        app_product:
+          type: string
+          description: Application product
+          example: GDM
+        app_version:
+          type: string
+          description: Application version number
+          example: 19.1.54
+        date_verified:
+          type: string
+          description: ISO8601 datetime when verification of blood glucose reading
+            was performed
+          example: '2021-10-27T11:59:50.123+01:00'
+        mobile_id:
+          type: string
+          description: Mobile device UUID
+          example: c28eb1cb-ca58-41b8-8acb-15721553f4f2
+        serial_number:
+          type: string
+          description: Bluetooth device serial number
+          example: SN987654321
+        is_bg_value_correct:
+          type: boolean
+          description: Was the blood glucose reading correct
+          example: true
+        blood_glucose_value:
+          type: number
+          description: Blood glucose value
+          example: '5.5'
+      title: Bluetooth meter update
+  responses:
+    BadRequest:
+      description: Bad or malformed request was received
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    ServiceUnavailable:
+      description: Service or dependent resource not available
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

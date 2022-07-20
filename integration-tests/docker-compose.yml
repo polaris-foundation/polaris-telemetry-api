@@ -1,0 +1,83 @@
+x-environment:
+  &COMMON_ENVIRONMENT
+  ENVIRONMENT: DEVELOPMENT
+  PROXY_URL: http://localhost
+  HS_ISSUER: http://localhost/
+  HS_KEY: secret
+  AUTH0_MGMT_CLIENT_ID: "doesnotmatter"
+  AUTH0_MGMT_CLIENT_SECRET: "shhh"
+  AUTH0_AUTHZ_CLIENT_ID: "doesnotmatter"
+  AUTH0_AUTHZ_CLIENT_SECRET: "shhh"
+  AUTH0_AUTHZ_WEBTASK_URL: "doesnotmatter"
+  AUTH0_CLIENT_ID: "doesnotmatter"
+  AUTH0_AUDIENCE: "http://localhost/"
+  NONCUSTOM_AUTH0_DOMAIN: "https://integration-tests"
+  AUTH0_CUSTOM_DOMAIN: "dev"
+  DISABLE_CREATE_USER_IN_AUTH0: "True"
+  AUTH0_HS_KEY: "secret"
+  DATABASE_HOST: dhos-telemetry-api-db
+  DATABASE_PORT: 5432
+  DATABASE_USER: dhos-telemetry-api-db
+  DATABASE_PASSWORD: dhos-telemetry-api-db
+  DATABASE_NAME: dhos-telemetry-api-db
+  REDIS_HOST: localhost
+  REDIS_PORT: 6379
+  REDIS_PASSWORD: any
+  TOKEN_URL: "https://integration-tests/oauth/token"
+  CUSTOMER_CODE: DEV
+  LOG_LEVEL: DEBUG
+  LOG_FORMAT: COLOUR
+  SERVER_TIMEZONE: Europe/London
+
+services:
+  dhos-telemetry-integration-tests:
+    container_name: "dhos-telemetry-integration-tests"
+    build:
+      context: ./
+      args:
+        - PIP_EXTRA_INDEX_URL
+    environment:
+      <<: *COMMON_ENVIRONMENT
+      BEHAVE_ARGS: ${BEHAVE_ARGS:-}
+      REPORT_PORTAL_URL: ${REPORT_PORTAL_URL:-}
+      REPORT_PORTAL_TOKEN: ${REPORT_PORTAL_TOKEN:-}
+      REPORT_PORTAL_PROJECT: ${REPORT_PORTAL_PROJECT:-}
+      ENVIRONMENT: ${ENVIRONMENT:-}
+      RELEASE: ${RELEASE:-}
+    command: >
+      bash -c "behave --no-capture --no-logcapture ${BEHAVE_ARGS:-}"
+    depends_on:
+      "dhos-telemetry-api":
+        condition: service_healthy
+
+  dhos-telemetry-api:
+    container_name: "dhos-telemetry-api"
+    build:
+      context: ..
+      args:
+        - GEMFURY_DOWNLOAD_KEY
+    environment:
+      <<: *COMMON_ENVIRONMENT
+    command: >-
+      bash -c "flask db upgrade && python -m dhos_telemetry_api"
+    healthcheck:
+      test: curl -f http://localhost:5000/running || false
+      interval: 3s
+      retries: 40
+      start_period: 5s
+    depends_on:
+      "dhos-telemetry-api-db":
+        condition: service_healthy
+
+  dhos-telemetry-api-db:
+    container_name: "dhos-telemetry-api-db"
+    image: docker.io/postgres
+    environment:
+      POSTGRES_USER: dhos-telemetry-api-db
+      POSTGRES_DB: dhos-telemetry-api-db
+      POSTGRES_PASSWORD: dhos-telemetry-api-db
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER}" ]
+      interval: 2s
+      timeout: 5s
+      retries: 20

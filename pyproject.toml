@@ -1,0 +1,68 @@
+[tool.poetry]
+name = "dhos-telemetry-api"
+version = "0.0.1"
+description = "Telemetry API to manage device information"
+authors = ["Ian Simpson <ian.simpson@sensynehealth.com>"]
+keywords = ["Telemetry", "DHOS"]
+repository = "https://github.com/draysontechnologies/dhos-telemetry-api"
+
+[[tool.poetry.source]]
+name = "sensynehealth"
+url = "https://pypi.fury.io/sensynehealth/"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+flask-batteries-included = {version = "3.*", extras = ["apispec", "pgsql"]}
+jsonschema = "3.*"
+she-logging = "1.*"
+
+[tool.poetry.dev-dependencies]
+bandit = "*"
+black = "*"
+coloredlogs = "*"
+coverage = "*"
+isort = "*"
+mock = "*"
+mypy = "*"
+pytest = "*"
+pytest-dhos = {version = "*", extras=["fbi"]}
+pytest-flask = "*"
+pytest-mock = "*"
+requests_mock = "1.8.*"
+sadisplay = "*"
+safety = "*"
+tox = "*"
+types-PyYAML = "*"
+types-requests = "*"
+types-mock = "*"
+
+[tool.mypy]
+namespace_packages=true
+ignore_missing_imports=false
+disallow_untyped_defs=true
+
+[[tool.mypy.overrides]]
+module = [
+    "waitress",
+    "pytest",
+    "flask.testing",
+    "apispec.*",
+    "connexion",
+    "apispec_webframeworks.*",
+    "pytest_mock",
+    "jose",
+    "flask",
+    "sadisplay",
+    "pytest_dhos.*",
+    "sqlalchemy.*",
+    "flask_sqlalchemy.*"
+]
+ignore_missing_imports = true
+
+[tool.isort]
+profile = "black"
+known_third_party = ["alembic", "apispec", "apispec_webframeworks", "behave", "click", "clients", "connexion", "environs", "faker", "flask", "flask_batteries_included", "helpers", "jose", "marshmallow", "mock", "pytest", "pytest_mock", "reporting", "reportportal_behave", "requests", "sadisplay", "she_logging", "sqlalchemy", "waitress", "yaml"]
+
+[tool.black]
+line-length = 88
+target-version = ["py39"]

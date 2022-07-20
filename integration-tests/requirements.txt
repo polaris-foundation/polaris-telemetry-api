@@ -1,0 +1,11 @@
+assertpy==1.*
+behave
+black
+environs
+faker
+isort
+mypy
+python-dateutil==2.*
+python-jose==3.*
+reportportal-behave-client==1.*
+requests==2.*
