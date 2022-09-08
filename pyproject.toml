@@ -4,7 +4,7 @@ version = "0.0.1"
 description = "Telemetry API to manage device information"
 authors = ["Ian Simpson <ian.simpson@sensynehealth.com>"]
 keywords = ["Telemetry", "DHOS"]
-repository = "https://github.com/polaris-foundation/dhos-telemetry-api"
+repository = "https://github.com/polaris-foundation/polaris-telemetry-api"
 
 [tool.poetry.dependencies]
 python = "^3.9"
